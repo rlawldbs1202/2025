@@ -1,64 +1,33 @@
 import streamlit as st
-import pandas as pd
-import datetime
+import random
 
-st.title("급식 메뉴 앱")
-st.write("오늘 메뉴 확인과 좋아하는 메뉴 체크가 가능합니다.")
-
-# ----- 급식 데이터 -----
-menu_data = {
-    "요일": ["월", "화", "수", "목", "금"],
-    "메뉴": [
-        "김밥, 우동, 사과",
-        "비빔밥, 계란국, 바나나",
-        "카레라이스, 오이무침, 귤",
-        "라면, 김치전, 배",
-        "떡볶이, 단무지, 요구르트"
-    ],
-    "칼로리": [550, 600, 580, 620, 500]
+# 기본 메뉴 데이터
+menu_dict = {
+    "한식": ["김치찌개", "불고기", "비빔밥", "삼겹살", "된장찌개"],
+    "중식": ["짜장면", "짬뽕", "탕수육", "마파두부", "양장피"],
+    "일식": ["초밥", "라멘", "돈카츠", "우동", "가츠동"],
+    "양식": ["파스타", "스테이크", "피자", "리조또", "샐러드"]
 }
 
-df = pd.DataFrame(menu_data)
+st.title("🍽️ 오늘의 저녁 메뉴 추천 앱")
 
-# ----- 오늘 요일 계산 (월=0, 금=4) -----
-today_index = datetime.datetime.today().weekday()
-if today_index > 4:
-    today_index = 0  # 주말은 월요일 메뉴 표시
-today_menu = df.iloc[today_index]
+# 카테고리 선택
+category = st.selectbox("먹고 싶은 종류를 골라보세요:", ["전체"] + list(menu_dict.keys()))
 
-st.subheader("오늘의 급식")
-st.write(f"메뉴: {today_menu['메뉴']}")
-st.write(f"칼로리: {today_menu['칼로리']} kcal")
-
-# ----- 좋아하는 메뉴 체크 -----
-st.subheader("좋아하는 메뉴 선택")
-if "favorites" not in st.session_state:
-    st.session_state["favorites"] = []
-
-# 체크박스별로 session_state 업데이트 (단순 루프)
-for i, row in df.iterrows():
-    key_name = f"menu_checkbox_{i}"
-    if key_name not in st.session_state:
-        st.session_state[key_name] = row["메뉴"] in st.session_state["favorites"]
-
-    checked = st.checkbox(f"{row['요일']}요일: {row['메뉴']} ({row['칼로리']} kcal)",
-                          value=st.session_state[key_name],
-                          key=key_name)
-    
-    st.session_state[key_name] = checked
-    if checked:
-        if row["메뉴"] not in st.session_state["favorites"]:
-            st.session_state["favorites"].append(row["메뉴"])
+# 사용자 메뉴 추가 기능
+new_menu = st.text_input("추가하고 싶은 메뉴를 입력하세요:")
+if st.button("메뉴 추가하기"):
+    if category != "전체":
+        menu_dict[category].append(new_menu)
+        st.success(f"✅ '{new_menu}' 가 {category} 메뉴에 추가되었습니다!")
     else:
-        if row["메뉴"] in st.session_state["favorites"]:
-            st.session_state["favorites"].remove(row["메뉴"])
+        st.warning("⚠️ 카테고리를 먼저 선택해주세요.")
 
-# ----- 좋아하는 메뉴 표시 -----
-if st.session_state["favorites"]:
-    st.subheader("선택한 좋아하는 메뉴")
-    for fav in st.session_state["favorites"]:
-        st.write(f"- {fav}")
-
-# ----- 주간 메뉴 전체 표시 (단순) -----
-st.subheader("이번 주 급식")
-st.table(df)
+# 추천 버튼
+if st.button("오늘의 메뉴 추천받기 🎲"):
+    if category == "전체":
+        all_menus = sum(menu_dict.values(), [])
+        choice = random.choice(all_menus)
+    else:
+        choice = random.choice(menu_dict[category])
+    st.subheader(f"👉 오늘 저녁은 **{choice}** 어떠세요? 😋")
