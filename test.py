@@ -10,17 +10,20 @@ menu_dict = {
     "양식": ["파스타", "스테이크", "피자", "리조또", "샐러드"]
 }
 
+st.set_page_config(page_title="저녁 메뉴 추천기", page_icon="🍽️")
+
 st.title("🍽️ 오늘의 저녁 메뉴 추천 앱")
 
 # 카테고리 선택
 category = st.selectbox("먹고 싶은 종류를 골라보세요:", ["전체"] + list(menu_dict.keys()))
 
 # 사용자 메뉴 추가 기능
-new_menu = st.text_input("추가하고 싶은 메뉴를 입력하세요:")
+st.write("✏️ 새로운 메뉴를 직접 추가할 수도 있어요!")
+new_menu = st.text_input("추가할 메뉴를 입력하세요:")
 
 if st.button("메뉴 추가하기"):
     if category == "전체":
-        st.warning("⚠️ '전체' 카테고리에는 메뉴를 직접 추가할 수 없어요. 카테고리를 선택해주세요.")
+        st.warning("⚠️ '전체' 카테고리에는 직접 메뉴를 추가할 수 없어요. 특정 카테고리를 선택해주세요.")
     elif new_menu.strip() == "":
         st.warning("⚠️ 메뉴 이름을 입력해주세요!")
     else:
